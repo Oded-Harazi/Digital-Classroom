@@ -4,8 +4,69 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Math Tutoring Website</title>
+
+    <!-- CSS Files -->
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="customize_styles.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBoFab7YOyN_KpViQu_0FxbBPF-iNPqgDI",
+        authDomain: "oded-digital-classroom.firebaseapp.com",
+        databaseURL: "https://oded-digital-classroom.firebaseio.com",
+        projectId: "oded-digital-classroom",
+        storageBucket: "oded-digital-classroom.appspot.com",
+        messagingSenderId: "861377774129",
+        appId: "1:861377774129:web:adabecb825ac11f310cb10"
+      };
+
+      // Initialize Firebase
+      const app = firebase.initializeApp(firebaseConfig);
+      const database = firebase.database();
+    </script>
+
+    <!-- Your website scripts -->
+    <script src="scripts.js" defer></script>
+
+    <!-- Page-specific styles -->
+    <style>
+        .edit-mode-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: none;
+        }
+        .right-click-dropdown, .edit-dropdown {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            z-index: 1000;
+        }
+        .draggable {
+            position: absolute;
+        }
+        #preset-container {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            z-index: 1000;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Your website content here (no changes needed below!) -->
+
     <script src="scripts.js" defer></script>
     <style>
         .edit-mode-button {
