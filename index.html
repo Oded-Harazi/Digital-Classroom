@@ -1,160 +1,152 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Tutoring Website</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Math Tutoring Website</title>
 
-    <!-- CSS Files -->
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="customize_styles.css">
+  <!-- CSS Files -->
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="customize_styles.css">
 
-    <!-- Firebase SDKs -->
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js"></script>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/11.6.1/firebase-database.js"></script>
 
-    <script>
-      const firebaseConfig = {
-        apiKey: "AIzaSyBoFab7YOyN_KpViQu_0FxbBPF-iNPqgDI",
-        authDomain: "oded-digital-classroom.firebaseapp.com",
-        databaseURL: "https://oded-digital-classroom.firebaseio.com",
-        projectId: "oded-digital-classroom",
-        storageBucket: "oded-digital-classroom.appspot.com",
-        messagingSenderId: "861377774129",
-        appId: "1:861377774129:web:adabecb825ac11f310cb10"
-      };
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBoFab7YOyN_KpViQu_0FxbBPF-iNPqgDI",
+      authDomain: "oded-digital-classroom.firebaseapp.com",
+      databaseURL: "https://oded-digital-classroom.firebaseio.com",
+      projectId: "oded-digital-classroom",
+      storageBucket: "oded-digital-classroom.appspot.com",
+      messagingSenderId: "861377774129",
+      appId: "1:861377774129:web:adabecb825ac11f310cb10"
+    };
 
-      // Initialize Firebase
-      const app = firebase.initializeApp(firebaseConfig);
-      const database = firebase.database();
-    </script>
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const database = firebase.database();
+  </script>
 
-    <!-- Page-specific styles -->
-    <style>
-        .edit-mode-button {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            z-index: 1000;
-            display: none;
-        }
-        .right-click-dropdown, .edit-dropdown {
-            position: absolute;
-            background-color: white;
-            border: 1px solid #ccc;
-            padding: 10px;
-            z-index: 1000;
-        }
-        .draggable {
-            position: absolute;
-        }
-        #preset-container {
-            position: fixed;
-            bottom: 10px;
-            right: 10px;
-            background-color: white;
-            border: 1px solid #ccc;
-            padding: 10px;
-            z-index: 1000;
-            display: none;
-        }
-    </style>
+  <!-- Page-specific styles -->
+  <style>
+    .edit-mode-button {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      display: none;
+    }
+    .right-click-dropdown, .edit-dropdown {
+      position: absolute;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      z-index: 1000;
+    }
+    .draggable {
+      position: absolute;
+    }
+    #preset-container {
+      position: fixed;
+      bottom: 10px;
+      right: 10px;
+      background-color: white;
+      border: 1px solid #ccc;
+      padding: 10px;
+      z-index: 1000;
+      display: none;
+    }
+  </style>
 </head>
 
 <body>
 
-    <!-- Edit mode toggle button, only visible for admins -->
-    <button id="toggleButton" class="edit-mode-button" onclick="toggleMode()">Classroom Mode</button>
+  <!-- Edit mode toggle button -->
+  <button id="toggleButton" class="edit-mode-button" onclick="toggleMode()">Classroom Mode</button>
 
-    <header id="header" contenteditable="false">
-        <nav>
-            <a href="index.html" id="home-link">Home</a>
-            <a href="lessons.html">Lessons</a>
-            <a href="forum.html">Forum</a>
-            <a href="progress.html">Progress</a>
-            <a href="resources.html">More Resources</a>
+  <header id="header" contenteditable="false">
+    <nav>
+      <a href="index.html" id="home-link">Home</a>
+      <a href="lessons.html">Lessons</a>
+      <a href="forum.html">Forum</a>
+      <a href="progress.html">Progress</a>
+      <a href="resources.html">More Resources</a>
 
-            <div id="user-section" class="user-section">
-                <!-- Login/Logout and username will be dynamically populated here -->
-            </div>
-        </nav>
-    </header>
+      <div id="user-section" class="user-section">
+        <!-- Login/Logout and username will be dynamically populated here -->
+      </div>
+    </nav>
+  </header>
 
-    <main>
-        <section class="hero">
-            <h1 id="hero-title" contenteditable="false">Welcome to Math Tutoring</h1>
-            <p id="hero-description" contenteditable="false">Your path to mastering mathematics.</p>
+  <main>
+    <section class="hero">
+      <h1 id="hero-title" contenteditable="false">Welcome to Math Tutoring</h1>
+      <p id="hero-description" contenteditable="false">Your path to mastering mathematics.</p>
 
-            <section class="math-graphic-container" contenteditable="false">
-                <img src="path-to-math-graphic.png" alt="Math Graphic" class="math-graphic">
-            </section>
-        </section>
+      <section class="math-graphic-container" contenteditable="false">
+        <img src="path-to-math-graphic.png" alt="Math Graphic" class="math-graphic">
+      </section>
+    </section>
 
-        <section class="content">
-            <h2 id="about-title" contenteditable="false">About Us</h2>
-            <p id="about-description" contenteditable="false">We offer comprehensive math tutoring services...</p>
-            <div class="video-container" contenteditable="false">
-                <iframe src="https://www.youtube.com/embed/your-video-id" frameborder="0" allowfullscreen></iframe>
-            </div>
-        </section>
-    </main>
+    <section class="content">
+      <h2 id="about-title" contenteditable="false">About Us</h2>
+      <p id="about-description" contenteditable="false">We offer comprehensive math tutoring services...</p>
+      <div class="video-container" contenteditable="false">
+        <iframe src="https://www.youtube.com/embed/your-video-id" frameborder="0" allowfullscreen></iframe>
+      </div>
+    </section>
+  </main>
 
-    <footer>
-        <p id="footer-text" contenteditable="false">&copy; 2024 Math Tutoring. All rights reserved.</p>
-    </footer>
+  <footer>
+    <p id="footer-text" contenteditable="false">&copy; 2024 Math Tutoring. All rights reserved.</p>
+  </footer>
 
-    <!-- Preset container for saving and resetting page states -->
-    <div id="preset-container">
-        <h4>Presets</h4>
-        <input type="text" id="preset-name" placeholder="Enter preset name">
-        <button onclick="savePreset()">Save Preset</button>
-        <button onclick="resetPage()">Reset Page</button>
-        <div id="presets-list"></div>
+  <!-- Preset container -->
+  <div id="preset-container">
+    <h4>Presets</h4>
+    <input type="text" id="preset-name" placeholder="Enter preset name">
+    <button onclick="savePreset()">Save Preset</button>
+    <button onclick="resetPage()">Reset Page</button>
+    <div id="presets-list"></div>
+  </div>
+
+  <!-- Normal dropdown menu -->
+  <div id="normal-dropdown" class="edit-dropdown" style="display:none;">
+    <div class="dropdown-header">
+      <button class="close-dropdown" unselectable="on">X</button>
+      <div class="drag-dropdown" unselectable="on">⬤</div>
     </div>
-
-    <!-- Include normal dropdown menu for selected elements -->
-    <div id="normal-dropdown" class="edit-dropdown" style="display:none;">
-        <div class="dropdown-header">
-            <button class="close-dropdown" unselectable="on">X</button>
-            <div class="drag-dropdown" unselectable="on">⬤</div>
-        </div>
-        <div class="dropdown-content">
-            <div class="dropdown-tabs">
-                <button class="tablink" onclick="openTab(event, 'Text')">Text</button>
-                <button class="tablink" onclick="openTab(event, 'Background')">Background</button>
-                <button class="tablink" onclick="openTab(event, 'Border')">Border</button>
-                <button class="tablink" onclick="openTab(event, 'Other')">Other</button>
-            </div>
-            <div id="Text" class="tabcontent">
-                <!-- Add text-editing options here -->
-            </div>
-            <div id="Background" class="tabcontent">
-                <!-- Add background-editing options here -->
-            </div>
-            <div id="Border" class="tabcontent">
-                <!-- Add border-editing options here -->
-            </div>
-            <div id="Other" class="tabcontent">
-                <!-- Add other-editing options here -->
-            </div>
-        </div>
+    <div class="dropdown-content">
+      <div class="dropdown-tabs">
+        <button class="tablink" onclick="openTab(event, 'Text')">Text</button>
+        <button class="tablink" onclick="openTab(event, 'Background')">Background</button>
+        <button class="tablink" onclick="openTab(event, 'Border')">Border</button>
+        <button class="tablink" onclick="openTab(event, 'Other')">Other</button>
+      </div>
+      <div id="Text" class="tabcontent"></div>
+      <div id="Background" class="tabcontent"></div>
+      <div id="Border" class="tabcontent"></div>
+      <div id="Other" class="tabcontent"></div>
     </div>
+  </div>
 
-    <!-- Include right-click dropdown menu -->
-    <div id="right-click-dropdown" class="right-click-dropdown" style="display:none;">
-        <div class="dropdown-header">
-            <button class="close-dropdown" unselectable="on">X</button>
-            <div class="drag-dropdown" unselectable="on">⬤</div>
-        </div>
-        <div class="dropdown-content">
-            <label>Area Color: <input type="color" id="right-background-color"></label>
-            <label>Add Textbox: <button id="add-textbox">Add</button></label>
-            <label>Change Website Background Color: <input type="color" id="website-background-color"></label>
-        </div>
+  <!-- Right-click dropdown -->
+  <div id="right-click-dropdown" class="right-click-dropdown" style="display:none;">
+    <div class="dropdown-header">
+      <button class="close-dropdown" unselectable="on">X</button>
+      <div class="drag-dropdown" unselectable="on">⬤</div>
     </div>
+    <div class="dropdown-content">
+      <label>Area Color: <input type="color" id="right-background-color"></label>
+      <label>Add Textbox: <button id="add-textbox">Add</button></label>
+      <label>Change Website Background Color: <input type="color" id="website-background-color"></label>
+    </div>
+  </div>
 
-    <!-- Load scripts LAST (important for Firebase and functions) -->
-    <script src="scripts.js" defer></script>
+  <!-- Load scripts LAST -->
+  <script src="scripts.js" defer></script>
 
 </body>
 </html>
