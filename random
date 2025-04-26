@@ -1,0 +1,616 @@
+document.addEventListener('DOMContentLoaded', () => {
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+    if (currentUser) {
+        document.getElementById('user-section').innerHTML = `
+            <span>Welcome, ${capitalizeUsername(currentUser.username)}</span>
+            <a href="#" id="logout-link">Logout</a>
+        `;
+        document.getElementById('logout-link').addEventListener('click', () => {
+            localStorage.removeItem('currentUser');
+            location.reload();
+        });
+
+        // Display admin link if the user is an admin
+        if (currentUser.isAdmin) {
+            const adminLink = document.createElement('a');
+            adminLink.href = 'admin.html';
+            adminLink.textContent = 'Admin';
+            document.querySelector('nav').appendChild(adminLink);
+        }
+    } else {
+        document.getElementById('user-section').innerHTML = `<a href="login.html">Login</a>`;
+    }
+
+    // Load lessons and quizzes
+    loadLessons();
+
+    // Load progress page if on progress.html
+    if (document.getElementById('progress-table')) {
+        loadProgress();
+    }
+
+    // Helper functions
+    function saveCheckboxState(username, index, isChecked) {
+        let checkboxStates = JSON.parse(localStorage.getItem('checkboxStates')) || {};
+        if (!checkboxStates[username]) {
+            checkboxStates[username] = {};
+        }
+        checkboxStates[username][`checkbox-${index}`] = isChecked;
+        localStorage.setItem('checkboxStates', JSON.stringify(checkboxStates));
+    }
+
+    function loadCheckboxState(username, index) {
+        let checkboxStates = JSON.parse(localStorage.getItem('checkboxStates')) || {};
+        return checkboxStates[username] && checkboxStates[username][`checkbox-${index}`];
+    }
+
+    function capitalizeUsername(username) {
+        return username.charAt(0).toUpperCase() + username.slice(1);
+    }
+
+    function loadLessons() {
+        const lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+        const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+        const lessonsContainer = document.getElementById('lessons-list');
+        const lessonFraction = document.getElementById('lesson-fraction');
+        let checkedCount = 0;
+
+        if (lessonsContainer) {
+            lessonsContainer.innerHTML = '';
+            lessons.forEach((lesson, index) => {
+                const lessonElement = document.createElement('div');
+                lessonElement.classList.add('lesson');
+                lessonElement.innerHTML = `
+                    <h3>${lesson.title}</h3>
+                    <p>${lesson.description}</p>
+                    ${lesson.file ? `<a href="${lesson.file}" download>Download Attachment</a>` : ''}
+                    <p>Posted by: ${capitalizeUsername(lesson.username)}</p>
+                    <iframe src="${lesson.video}" frameborder="0" allowfullscreen></iframe>
+                    <a href="lesson_detail.html?title=${lesson.title}">Go to Lesson</a>
+                    ${currentUser && currentUser.isAdmin ? `<a href="#" class="edit-lesson" data-index="${index}">Edit</a> <a href="#" class="delete-lesson" data-index="${index}">Delete</a>` : ''}
+                    <input type="checkbox" class="lesson-checkbox" style="float: right;" data-index="${index}" ${loadCheckboxState(currentUser.username, `lesson-${index}`) ? 'checked' : ''}>
+                `;
+                lessonsContainer.appendChild(lessonElement);
+            });
+
+            quizzes.forEach((quiz, index) => {
+                const quizElement = document.createElement('div');
+                quizElement.classList.add('quiz');
+                quizElement.innerHTML = `
+                    <h3>${quiz.title}</h3>
+                    <p>${quiz.description}</p>
+                    ${quiz.file ? `<a href="${quiz.file}" download>Download Attachment</a>` : ''}
+                    <p>Posted by: ${capitalizeUsername(quiz.username)}</p>
+                    <iframe src="${quiz.video}" frameborder="0" allowfullscreen></iframe>
+                    <a href="quiz_detail.html?title=${quiz.title}">Go to Quiz</a>
+                    ${currentUser && currentUser.isAdmin ? `<a href="#" class="edit-quiz" data-index="${index}">Edit</a> <a href="#" class="delete-quiz" data-index="${index}">Delete</a>` : ''}
+                    <input type="checkbox" class="quiz-checkbox" style="float: right;" data-index="${index}" ${loadCheckboxState(currentUser.username, `quiz-${index}`) ? 'checked' : ''}>
+                `;
+                lessonsContainer.appendChild(quizElement);
+            });
+
+            // Event listener for checkboxes
+            const allCheckboxes = document.querySelectorAll('.lesson-checkbox, .quiz-checkbox');
+
+            allCheckboxes.forEach((checkbox) => {
+                checkbox.addEventListener('change', (event) => {
+                    const index = event.target.dataset.index;
+                    const type = event.target.classList.contains('lesson-checkbox') ? 'lesson' : 'quiz';
+                    saveCheckboxState(currentUser.username, `${type}-${index}`, checkbox.checked);
+                    updateCheckedCount();
+                });
+            });
+
+            function updateCheckedCount() {
+                checkedCount = Array.from(allCheckboxes).filter(cb => cb.checked).length;
+                const totalCount = allCheckboxes.length;
+                lessonFraction.textContent = `${checkedCount}/${totalCount} checked`;
+                updateProgressBar('lesson-progress-container', 'lesson-fraction', 'lesson');
+            }
+
+            updateCheckedCount();
+
+            // Event listeners for edit and delete
+            document.querySelectorAll('.edit-lesson').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const index = event.target.dataset.index;
+                    editLesson(index);
+                });
+            });
+
+            document.querySelectorAll('.delete-lesson').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const index = event.target.dataset.index;
+                    deleteLesson(index);
+                });
+            });
+
+            document.querySelectorAll('.edit-quiz').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const index = event.target.dataset.index;
+                    editQuiz(index);
+                });
+            });
+
+            document.querySelectorAll('.delete-quiz').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const index = event.target.dataset.index;
+                    deleteQuiz(index);
+                });
+            });
+        }
+    }
+
+    function editLesson(index) {
+        const lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+        const lesson = lessons[index];
+        const newTitle = prompt('Edit Lesson Title:', lesson.title);
+        const newDescription = prompt('Edit Lesson Description:', lesson.description);
+        if (newTitle !== null) lesson.title = newTitle;
+        if (newDescription !== null) lesson.description = newDescription;
+        localStorage.setItem('lessons', JSON.stringify(lessons));
+        loadLessons();
+    }
+
+    function deleteLesson(index) {
+        const lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+        lessons.splice(index, 1);
+        localStorage.setItem('lessons', JSON.stringify(lessons));
+        loadLessons();
+    }
+
+    function editQuiz(index) {
+        const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+        const quiz = quizzes[index];
+        const newTitle = prompt('Edit Quiz Title:', quiz.title);
+        const newDescription = prompt('Edit Quiz Description:', quiz.description);
+        if (newTitle !== null) quiz.title = newTitle;
+        if (newDescription !== null) quiz.description = newDescription;
+        localStorage.setItem('quizzes', JSON.stringify(quizzes));
+        loadLessons();
+    }
+
+    function deleteQuiz(index) {
+        const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+        quizzes.splice(index, 1);
+        localStorage.setItem('quizzes', JSON.stringify(quizzes));
+        loadLessons();
+    }
+
+    function updateProgressBar(containerId, fractionId, type) {
+        const lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+        const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+        const items = lessons.concat(quizzes);
+        const container = document.getElementById(containerId);
+        const fractionElement = document.getElementById(fractionId);
+        const progressBar = container.querySelector('.progress-bar .progress');
+        let checkedCount = 0;
+
+        items.forEach((item, index) => {
+            const isChecked = loadCheckboxState(currentUser.username, item.title.includes('quiz') ? `quiz-${index}` : `lesson-${index}`);
+            if (isChecked) {
+                checkedCount++;
+            }
+        });
+
+        const totalItems = items.length;
+        const progressPercentage = totalItems > 0 ? (checkedCount / totalItems) * 100 : 0;
+        fractionElement.textContent = `${checkedCount}/${totalItems} checked`;
+
+        progressBar.style.width = '0%';
+        setTimeout(() => {
+            progressBar.style.width = `${progressPercentage}%`;
+        }, 10);
+    }
+
+    function loadProgress() {
+        const username = currentUser.username;
+        document.getElementById('user-progress-title').textContent = `${capitalizeUsername(username)}'s Progress`;
+
+        const lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+        const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+        const progressTable = document.getElementById('progress-table');
+
+        if (progressTable) {
+            progressTable.innerHTML = `
+                <div class="header">
+                    <div>Type</div>
+                    <div>Title</div>
+                    <div>Status</div>
+                </div>
+            `;
+
+            const items = lessons.concat(quizzes);
+
+            items.forEach((item, index) => {
+                const isChecked = loadCheckboxState(username, item.title.includes('quiz') ? `quiz-${index}` : `lesson-${index}`);
+                const statusClass = isChecked ? 'completed' : 'not-completed';
+
+                const row = document.createElement('div');
+                row.classList.add(statusClass);
+                row.innerHTML = `
+                    <div>${item.title.includes('quiz') ? 'Quiz' : 'Lesson'}</div>
+                    <div>${item.title}</div>
+                    <div>${isChecked ? 'Completed' : 'Not Completed'}</div>
+                `;
+                progressTable.appendChild(row);
+            });
+        }
+    }
+
+    // Login and Signup
+    const loginForm = document.getElementById('login-form');
+    if (loginForm) {
+        loginForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const storedPassword = localStorage.getItem(`password-${username}`);
+            const isAdmin = localStorage.getItem(`user-${username}`) === 'admin';
+
+            if (!storedPassword) {
+                alert('User does not exist. Please sign up.');
+                return;
+            }
+
+            if (storedPassword !== password) {
+                alert('Incorrect password. Please try again.');
+                return;
+            }
+
+            localStorage.setItem('currentUser', JSON.stringify({ username, isAdmin }));
+            location.href = 'index.html';
+        });
+    }
+
+    const signupForm = document.getElementById('signup-form');
+    if (signupForm) {
+        signupForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const isAdmin = document.getElementById('admin').checked ? 'admin' : 'user';
+
+            localStorage.setItem(`user-${username}`, isAdmin);
+            localStorage.setItem(`password-${username}`, password);
+            localStorage.setItem('currentUser', JSON.stringify({ username, isAdmin: isAdmin === 'admin' }));
+            location.href = 'index.html';
+        });
+    }
+
+    // Admin Dashboard
+    const postQuizForm = document.getElementById('post-quiz-form');
+    if (postQuizForm) {
+        postQuizForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const quizTitle = document.getElementById('quiz-title').value;
+            const quizDescription = document.getElementById('quiz-description').value;
+            const quizFile = document.getElementById('quiz-file').files[0];
+            const quizVideo = document.getElementById('quiz-video').value;
+            const username = currentUser.username;
+
+            const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                quizzes.push({ title: quizTitle, description: quizDescription, file: e.target.result, video: quizVideo, username });
+                localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                alert('Quiz posted successfully!');
+                postQuizForm.reset();
+                loadLessons();
+            }
+            if (quizFile) {
+                reader.readAsDataURL(quizFile);
+            } else {
+                quizzes.push({ title: quizTitle, description: quizDescription, file: null, video: quizVideo, username });
+                localStorage.setItem('quizzes', JSON.stringify(quizzes));
+                alert('Quiz posted successfully!');
+                postQuizForm.reset();
+                loadLessons();
+            }
+        });
+    }
+
+    const postLessonForm = document.getElementById('post-lesson-form');
+    if (postLessonForm) {
+        postLessonForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const lessonTitle = document.getElementById('lesson-title').value;
+            const lessonDescription = document.getElementById('lesson-description').value;
+            const lessonFile = document.getElementById('lesson-file').files[0];
+            const lessonVideo = document.getElementById('lesson-video').value;
+            const username = currentUser.username;
+
+            const lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                lessons.push({ title: lessonTitle, description: lessonDescription, file: e.target.result, video: lessonVideo, username });
+                localStorage.setItem('lessons', JSON.stringify(lesson));
+                alert('Lesson posted successfully!');
+                postLessonForm.reset();
+                loadLessons();
+            }
+            if (lessonFile) {
+                reader.readAsDataURL(lessonFile);
+            } else {
+                lessons.push({ title: lessonTitle, description: lessonDescription, file: null, video: lessonVideo, username });
+                localStorage.setItem('lessons', JSON.stringify(lessons));
+                alert('Lesson posted successfully!');
+                postLessonForm.reset();
+                loadLessons();
+            }
+        });
+    }
+
+    // Forum
+    const postQuestionForm = document.getElementById('post-question-form');
+    if (postQuestionForm) {
+        postQuestionForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const questionTitle = document.getElementById('question-title').value;
+            const questionBody = document.getElementById('question-body').value;
+            const questionFile = document.getElementById('question-file').files[0];
+            const username = currentUser.username;
+
+            const forumPosts = JSON.parse(localStorage.getItem('forumPosts')) || [];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                forumPosts.push({ title: questionTitle, body: questionBody, file: e.target.result, username, resolved: false });
+                localStorage.setItem('forumPosts', JSON.stringify(forumPosts));
+                alert('Question posted successfully!');
+                postQuestionForm.reset();
+                location.href = 'forum.html'; // Redirect to forum page after posting
+            }
+            if (questionFile) {
+                reader.readAsDataURL(questionFile);
+            } else {
+                forumPosts.push({ title: questionTitle, body: questionBody, file: null, username, resolved: false });
+                localStorage.setItem('forumPosts', JSON.stringify(forumPosts));
+                alert('Question posted successfully!');
+                postQuestionForm.reset();
+                location.href = 'forum.html'; // Redirect to forum page after posting
+            }
+        });
+    }
+
+    // Load all previously posted forum posts
+    function loadForumPosts() {
+        const forumPosts = JSON.parse(localStorage.getItem('forumPosts')) || [];
+        const questionsList = document.getElementById('questions-list');
+        if (questionsList) {
+            questionsList.innerHTML = ''; // Clear the list before appending new items
+            forumPosts.forEach((post, index) => {
+                const postElement = document.createElement('div');
+                postElement.classList.add('question');
+                postElement.innerHTML = `
+                    <h3>${post.title}</h3>
+                    <p>${post.body}</p>
+                    ${post.file ? `<a href="${post.file}" download>Download Attachment</a>` : ''}
+                    <span>Posted by: ${capitalizeUsername(post.username)}</span>
+                    <button class="reply-button" data-index="${index}">Reply</button>
+                    ${currentUser.isAdmin || currentUser.username === post.username ? `<button class="resolve-button" data-index="${index}">Resolve</button> <button class="delete-button" data-index="${index}">Delete</button>` : ''}
+                    <div class="replies" id="replies-${index}"></div>
+                `;
+                questionsList.appendChild(postElement);
+            });
+
+            document.querySelectorAll('.reply-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const index = event.target.dataset.index;
+                    const replyText = prompt('Enter your reply:');
+                    if (replyText) {
+                        const forumPosts = JSON.parse(localStorage.getItem('forumPosts')) || [];
+                        if (!forumPosts[index].replies) {
+                            forumPosts[index].replies = [];
+                        }
+                        forumPosts[index].replies.push({ username: currentUser.username, text: replyText });
+                        localStorage.setItem('forumPosts', JSON.stringify(forumPosts));
+                        loadForumPosts();
+                    }
+                });
+            });
+
+            document.querySelectorAll('.resolve-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const index = event.target.dataset.index;
+                    const forumPosts = JSON.parse(localStorage.getItem('forumPosts')) || [];
+                    forumPosts[index].resolved = true;
+                    localStorage.setItem('forumPosts', JSON.stringify(forumPosts));
+                    loadForumPosts();
+                });
+            });
+
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const index = event.target.dataset.index;
+                    const forumPosts = JSON.parse(localStorage.getItem('forumPosts')) || [];
+                    forumPosts.splice(index, 1);
+                    localStorage.setItem('forumPosts', JSON.stringify(forumPosts));
+                    loadForumPosts();
+                });
+            });
+
+            forumPosts.forEach((post, index) => {
+                const repliesContainer = document.getElementById(`replies-${index}`);
+                if (repliesContainer && post.replies) {
+                    post.replies.forEach(reply => {
+                        const replyElement = document.createElement('div');
+                        replyElement.classList.add('reply');
+                        replyElement.innerHTML = `
+                            <p><strong>${capitalizeUsername(reply.username)}</strong>: ${reply.text}</p>
+                        `;
+                        repliesContainer.appendChild(replyElement);
+                    });
+                }
+            });
+        }
+    }
+
+    // Call loadForumPosts to display all forum posts on page load
+    loadForumPosts();
+
+    function loadResolvedForumPosts() {
+        const forumPosts = JSON.parse(localStorage.getItem('forumPosts')) || [];
+        const resolvedQuestionsList = document.getElementById('resolved-questions-list');
+        if (resolvedQuestionsList) {
+            resolvedQuestionsList.innerHTML = '';
+            forumPosts.forEach((post, index) => {
+                if (post.resolved) {
+                    const postElement = document.createElement('div');
+                    postElement.classList.add('question');
+                    postElement.innerHTML = `
+                        <h3>${post.title}</h3>
+                        <p>${post.body}</p>
+                        ${post.file ? `<a href="${post.file}" download>Download Attachment</a>` : ''}
+                        <span>Posted by: ${capitalizeUsername(post.username)}</span>
+                        ${currentUser.isAdmin ? `<button class="delete-button" data-index="${index}">Delete</button>` : ''}
+                        <div class="replies" id="replies-${index}"></div>
+                    `;
+                    resolvedQuestionsList.appendChild(postElement);
+                }
+            });
+
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const index = event.target.dataset.index;
+                    const forumPosts = JSON.parse(localStorage.getItem('forumPosts')) || [];
+                    forumPosts.splice(index, 1);
+                    localStorage.setItem('forumPosts', JSON.stringify(forumPosts));
+                    loadResolvedForumPosts();
+                });
+            });
+
+            forumPosts.forEach((post, index) => {
+                const repliesContainer = document.getElementById(`replies-${index}`);
+                if (repliesContainer && post.replies) {
+                    post.replies.forEach(reply => {
+                        const replyElement = document.createElement('div');
+                        replyElement.classList.add('reply');
+                        replyElement.innerHTML = `
+                            <p><strong>${capitalizeUsername(reply.username)}</strong>: ${reply.text}</p>
+                        `;
+                        repliesContainer.appendChild(replyElement);
+                    });
+                }
+            });
+        }
+    }
+
+    // Lesson and Quiz Submission
+    const quizAnswerForm = document.getElementById('quiz-answer-form');
+    if (quizAnswerForm) {
+        quizAnswerForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const answer = document.getElementById('quiz-answer').value;
+            const answerFile = document.getElementById('quiz-answer-file').files[0];
+            const username = currentUser.username;
+            const title = new URLSearchParams(window.location.search).get('title');
+
+            const submissions = JSON.parse(localStorage.getItem('submissions')) || {};
+            if (!submissions[username]) {
+                submissions[username] = {};
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                submissions[username][`quiz-${title}`] = { answer, file: e.target.result };
+                localStorage.setItem('submissions', JSON.stringify(submissions));
+                document.getElementById('submitted-answer').innerHTML = `<p>Your answer has been submitted.</p>`;
+                markAsSubmitted('quiz', title);
+            }
+            if (answerFile) {
+                reader.readAsDataURL(answerFile);
+            } else {
+                submissions[username][`quiz-${title}`] = { answer, file: null };
+                localStorage.setItem('submissions', JSON.stringify(submissions));
+                document.getElementById('submitted-answer').innerHTML = `<p>Your answer has been submitted.</p>`;
+                markAsSubmitted('quiz', title);
+            }
+        });
+    }
+
+    const lessonAnswerForm = document.getElementById('lesson-answer-form');
+    if (lessonAnswerForm) {
+        lessonAnswerForm.addEventListener('submit', (event) => {
+            event.preventDefault();
+            const answer = document.getElementById('lesson-answer').value;
+            const answerFile = document.getElementById('lesson-answer-file').files[0];
+            const username = currentUser.username;
+            const title = new URLSearchParams(window.location.search).get('title');
+
+            const submissions = JSON.parse(localStorage.getItem('submissions')) || {};
+            if (!submissions[username]) {
+                submissions[username] = {};
+            }
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                submissions[username][`lesson-${title}`] = { answer, file: e.target.result };
+                localStorage.setItem('submissions', JSON.stringify(submissions));
+                document.getElementById('submitted-answer').innerHTML = `<p>Your answer has been submitted.</p>`;
+                markAsSubmitted('lesson', title);
+            }
+            if (answerFile) {
+                reader.readAsDataURL(answerFile);
+            } else {
+                submissions[username][`lesson-${title}`] = { answer, file: null };
+                localStorage.setItem('submissions', JSON.stringify(submissions));
+                document.getElementById('submitted-answer').innerHTML = `<p>Your answer has been submitted.</p>`;
+                markAsSubmitted('lesson', title);
+            }
+        });
+    }
+
+    function markAsSubmitted(type, title) {
+        let submissions = JSON.parse(localStorage.getItem('submissions')) || {};
+        if (!submissions[currentUser.username]) {
+            submissions[currentUser.username] = {};
+        }
+        submissions[currentUser.username][`${type}-${title}`] = true;
+        localStorage.setItem('submissions', JSON.stringify(submissions));
+        loadLessons();
+        updateProgressBar('lesson-progress-container', 'lesson-fraction', 'lesson');
+        updateProgressBar('lesson-progress-container', 'lesson-fraction', 'quiz');
+    }
+
+    // Load resolved forum posts if on resolved_forum.html
+    if (document.getElementById('resolved-questions-list')) {
+        loadResolvedForumPosts();
+    }
+
+    // Admin: Load and manage users
+    if (currentUser && currentUser.isAdmin && document.getElementById('users-list')) {
+        loadUsers();
+    }
+
+    function loadUsers() {
+        const users = Object.keys(localStorage)
+            .filter(key => key.startsWith('user-'))
+            .map(key => key.replace('user-', ''));
+        const usersList = document.getElementById('users-list');
+        if (usersList) {
+            usersList.innerHTML = '';
+            users.forEach(username => {
+                const userElement = document.createElement('div');
+                userElement.classList.add('user');
+                userElement.innerHTML = `
+                    <p>Username: ${capitalizeUsername(username)}</p>
+                    <button class="delete-button" data-username="${username}">Delete</button>
+                `;
+                usersList.appendChild(userElement);
+            });
+
+            document.querySelectorAll('.delete-button').forEach(button => {
+                button.addEventListener('click', (event) => {
+                    const username = event.target.dataset.username;
+                    localStorage.removeItem(`user-${username}`);
+                    localStorage.removeItem(`password-${username}`);
+                    if (localStorage.getItem('currentUser') && JSON.parse(localStorage.getItem('currentUser')).username === username) {
+                        localStorage.removeItem('currentUser');
+                        location.href = 'index.html';
+                    } else {
+                        loadUsers();
+                    }
+                });
+            });
+        }
+    }
+});

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Flashcard Stack - Math Tutoring</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .create-flashcard-page {
+            padding: 2em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h2, p, label {
+            color: #333;
+        }
+
+        h2 {
+            animation: slideInRight 1s ease-in-out;
+        }
+
+        form {
+            margin-top: 2em;
+            animation: slideInUp 1.5s ease-in-out;
+        }
+
+        .flashcard {
+            border: 1px solid #ccc;
+            padding: 1em;
+            margin-bottom: 1em;
+            border-radius: 8px;
+            background-color: #fff;
+            transition: transform 0.3s ease;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 0.75em;
+            margin-bottom: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.75em 1.5em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        .color-scheme {
+            margin-bottom: 1em;
+        }
+
+        .color-scheme label {
+            display: inline-block;
+            width: 15%;
+            padding: 0.5em;
+            border-radius: 5px;
+            margin-right: 1em;
+            cursor: pointer;
+            border: 3px solid transparent;
+            text-align: center;
+        }
+
+        .color-scheme input[type="radio"] {
+            display: none;
+        }
+
+        .color-scheme input[type="radio"]:checked + label {
+            border: 3px solid #000;
+        }
+
+        .red { background-color: #ff0000; color: #fff; }
+        .green { background-color: #00ff00; color: #fff; }
+        .blue { background-color: #0000ff; color: #fff; }
+        .yellow { background-color: #ffff00; color: #000; }
+        .purple { background-color: #800080; color: #fff; }
+        .orange { background-color: #ffa500; color: #000; }
+        .pink { background-color: #ff69b4; color: #fff; }
+        .cyan { background-color: #00ffff; color: #000; }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+            <a href="flashcards.html">Flashcards</a>
+            <div id="user-section" class="user-section">
+                <!-- Login/Logout and username will be dynamically populated here -->
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="create-flashcard-page">
+            <h2>Create Flashcard Stack</h2>
+            <form id="flashcard-form">
+                <label for="stack-name">Stack Name:</label>
+                <input type="text" id="stack-name" name="stack-name" required>
+                <div class="flashcard">
+                    <label for="flashcard-front">Front:</label>
+                    <textarea id="flashcard-front" name="flashcard-front" required></textarea>
+                    <label for="flashcard-back">Back:</label>
+                    <textarea id="flashcard-back" name="flashcard-back" required></textarea>
+                </div>
+                <button type="button" id="add-flashcard">Add Another Card</button>
+                <div class="color-scheme">
+                    <p>Select Color Scheme:</p>
+                    <input type="radio" id="red" name="color" value="red" checked>
+                    <label for="red" class="red">Red</label>
+                    <input type="radio" id="green" name="color" value="green">
+                    <label for="green" class="green">Green</label>
+                    <input type="radio" id="blue" name="color" value="blue">
+                    <label for="blue" class="blue">Blue</label>
+                    <input type="radio" id="yellow" name="color" value="yellow">
+                    <label for="yellow" class="yellow">Yellow</label>
+                    <input type="radio" id="purple" name="color" value="purple">
+                    <label for="purple" class="purple">Purple</label>
+                    <input type="radio" id="orange" name="color" value="orange">
+                    <label for="orange" class="orange">Orange</label>
+                    <input type="radio" id="pink" name="color" value="pink">
+                    <label for="pink" class="pink">Pink</label>
+                    <input type="radio" id="cyan" name="color" value="cyan">
+                    <label for="cyan" class="cyan">Cyan</label>
+                </div>
+                <button type="submit">Create Stack</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const flashcardForm = document.getElementById('flashcard-form');
+            const addFlashcardButton = document.getElementById('add-flashcard');
+
+            addFlashcardButton.addEventListener('click', () => {
+                const newFlashcard = document.createElement('div');
+                newFlashcard.classList.add('flashcard');
+                newFlashcard.innerHTML = `
+                    <label for="flashcard-front">Front:</label>
+                    <textarea name="flashcard-front" required></textarea>
+                    <label for="flashcard-back">Back:</label>
+                    <textarea name="flashcard-back" required></textarea>
+                `;
+                flashcardForm.insertBefore(newFlashcard, addFlashcardButton);
+            });
+
+            flashcardForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const stackName = document.getElementById('stack-name').value;
+                const colorScheme = document.querySelector('input[name="color"]:checked').value;
+                const flashcards = [];
+                document.querySelectorAll('.flashcard').forEach(card => {
+                    const front = card.querySelector('textarea[name="flashcard-front"]').value;
+                    const back = card.querySelector('textarea[name="flashcard-back"]').value;
+                    flashcards.push({ front, back, colorScheme });
+                });
+                saveFlashcardStack(stackName, flashcards);
+            });
+
+            function saveFlashcardStack(stackName, flashcards) {
+                const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+                const stacks = JSON.parse(localStorage.getItem('flashcardStacks')) || [];
+                stacks.push({ username: currentUser.username, stackName, cards: flashcards });
+                localStorage.setItem('flashcardStacks', JSON.stringify(stacks));
+                alert('Flashcard stack created successfully!');
+                flashcardForm.reset();
+            }
+        });
+    </script>
+</body>
+</html>

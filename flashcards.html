@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards - Math Tutoring</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .flashcards-page {
+            padding: 2em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h2, p, label {
+            color: #333;
+        }
+
+        h2 {
+            animation: slideInRight 1s ease-in-out;
+        }
+
+        .flashcards-options a {
+            display: block;
+            margin: 1em 0;
+            padding: 0.75em 1.5em;
+            background-color: #4CAF50;
+            color: white;
+            text-align: center;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .flashcards-options a:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+            <div id="user-section" class="user-section">
+                <!-- Login/Logout and username will be dynamically populated here -->
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="flashcards-page">
+            <h2>Flashcards</h2>
+            <div class="flashcards-options">
+                <a href="create_flashcard.html">Create a Flashcard Stack</a>
+                <a href="my_flashcards.html">See Your Stacks</a>
+                <a href="all_flashcards.html">See Everyone's Stacks</a>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lesson Detail - Math Tutoring</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Custom Styles */
+        .lesson-detail-page {
+            padding: 2em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h2, p, label {
+            color: #333;
+        }
+
+        h2 {
+            animation: slideInLeft 1s ease-in-out;
+        }
+
+        p {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        form {
+            margin-top: 2em;
+            animation: slideInUp 1.5s ease-in-out;
+        }
+
+        input[type="file"], textarea {
+            margin-bottom: 1em;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.75em 1.5em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        .submitted-answer {
+            margin-top: 2em;
+            background-color: #e7f3e7;
+            border: 1px solid #c4e3c4;
+            padding: 1em;
+            border-radius: 5px;
+            animation: fadeInUp 2s ease-in-out;
+        }
+
+        /* Navigation Links */
+        .nav-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2em;
+        }
+
+        .nav-links a {
+            background-color: #4CAF50;
+            color: white;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+            <div id="user-section" class="user-section">
+                <!-- Login/Logout and username will be dynamically populated here -->
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="lesson-detail-page">
+            <h2 id="lesson-title">Lesson Title</h2>
+            <p id="lesson-description">Lesson Description</p>
+            <div id="lesson-content">
+                <!-- Lesson content will be dynamically populated here -->
+            </div>
+            <form id="lesson-answer-form">
+                <label for="lesson-answer">Your Answer:</label>
+                <textarea id="lesson-answer" name="lesson-answer" required></textarea>
+                <label for="lesson-answer-file">Attach a File:</label>
+                <input type="file" id="lesson-answer-file" name="lesson-answer-file" accept=".png, .jpg, .jpeg, .pdf">
+                <button type="submit">Submit</button>
+            </form>
+            <div id="submitted-answer" class="submitted-answer">
+                <!-- Submitted answer will be displayed here -->
+            </div>
+            <div class="nav-links">
+                <a href="#" id="prev-lesson">Previous</a>
+                <a href="#" id="next-lesson">Next</a>
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const lessonTitle = getParameterByName('title');
+            const lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+            const lesson = lessons.find(l => l.title === lessonTitle);
+
+            if (lesson) {
+                document.getElementById('lesson-title').textContent = lesson.title;
+                document.getElementById('lesson-description').textContent = lesson.description;
+                document.getElementById('lesson-content').innerHTML = `
+                    <iframe src="${lesson.video}" frameborder="0" allowfullscreen></iframe>
+                `;
+            }
+
+            const lessonAnswerForm = document.getElementById('lesson-answer-form');
+            if (lessonAnswerForm) {
+                lessonAnswerForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    const lessonAnswer = document.getElementById('lesson-answer').value;
+                    const lessonAnswerFile = document.getElementById('lesson-answer-file').files[0];
+                    const answers = JSON.parse(localStorage.getItem('answers')) || {};
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        answers[lessonTitle] = { text: lessonAnswer, file: e.target.result };
+                        localStorage.setItem('answers', JSON.stringify(answers));
+                        displaySubmittedAnswer(lessonTitle);
+                        markAsSubmitted('lesson', lessonTitle);
+                        animateProgressBar();
+                        showReminderPopup();
+                    }
+                    if (lessonAnswerFile) {
+                        reader.readAsDataURL(lessonAnswerFile);
+                    } else {
+                        answers[lessonTitle] = { text: lessonAnswer, file: null };
+                        localStorage.setItem('answers', JSON.stringify(answers));
+                        displaySubmittedAnswer(lessonTitle);
+                        markAsSubmitted('lesson', lessonTitle);
+                        animateProgressBar();
+                        showReminderPopup();
+                    }
+                });
+            }
+
+            displaySubmittedAnswer(lessonTitle);
+
+            function getParameterByName(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+
+            function displaySubmittedAnswer(lessonTitle) {
+                const answers = JSON.parse(localStorage.getItem('answers')) || {};
+                const submittedAnswer = answers[lessonTitle];
+                const submittedAnswerContainer = document.getElementById('submitted-answer');
+                if (submittedAnswer) {
+                    submittedAnswerContainer.innerHTML = `
+                        <p>Your Answer: ${submittedAnswer.text}</p>
+                        ${submittedAnswer.file ? `<a href="${submittedAnswer.file}" download>Download Attachment</a>` : ''}
+                    `;
+                }
+            }
+
+            function markAsSubmitted(type, title) {
+                let submissions = JSON.parse(localStorage.getItem('submissions')) || {};
+                if (!submissions[currentUser.username]) {
+                    submissions[currentUser.username] = {};
+                }
+                submissions[currentUser.username][`${type}-${title}`] = true;
+                localStorage.setItem('submissions', JSON.stringify(submissions));
+            }
+
+            function animateProgressBar() {
+                const progressBar = document.querySelector('.progress-bar .progress');
+                let width = 0;
+                const interval = setInterval(() => {
+                    if (width >= 100) {
+                        clearInterval(interval);
+                    } else {
+                        width++;
+                        progressBar.style.width = width + '%';
+                    }
+                }, 10);
+            }
+
+            function showReminderPopup() {
+                alert('Don\'t forget to check off this lesson in the lessons page!');
+            }
+
+            // Navigation between lessons
+          // Navigation between lessons and quizzes
+addNavigationLinks();
+
+function addNavigationLinks() {
+    const lessons = JSON.parse(localStorage.getItem('lessons')) || [];
+    const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+    const combinedItems = [...lessons.map(lesson => ({ ...lesson, type: 'lesson' })), ...quizzes.map(quiz => ({ ...quiz, type: 'quiz' }))];
+    combinedItems.sort((a, b) => a.timestamp - b.timestamp); // Sort by timestamp, oldest first
+
+    const currentIndex = combinedItems.findIndex(item => item.title === lessonTitle);
+
+    if (currentIndex > 0) {
+        const prevItem = combinedItems[currentIndex - 1];
+        const prevLink = document.getElementById('prev-lesson');
+        prevLink.href = prevItem.type === 'lesson' ? `lesson_detail.html?title=${prevItem.title}` : `quiz_detail.html?title=${prevItem.title}`;
+    } else {
+        document.getElementById('prev-lesson').style.display = 'none';
+    }
+
+    if (currentIndex < combinedItems.length - 1) {
+        const nextItem = combinedItems[currentIndex + 1];
+        const nextLink = document.getElementById('next-lesson');
+        nextLink.href = nextItem.type === 'lesson' ? `lesson_detail.html?title=${nextItem.title}` : `quiz_detail.html?title=${nextItem.title}`;
+    } else {
+        document.getElementById('next-lesson').style.display = 'none';
+    }
+}
+        });
+    </script>
+</body>
+</html>

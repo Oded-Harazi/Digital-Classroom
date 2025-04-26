@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcard Stack - Math Tutoring</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .flashcard-stack-page {
+            padding: 2em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .flashcard {
+            width: 200px;
+            height: 300px;
+            perspective: 1000px;
+            margin: 1em;
+            display: inline-block;
+            position: relative;
+        }
+
+        .flashcard-inner {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+
+        .flashcard.flip .flashcard-inner {
+            transform: rotateY(180deg);
+        }
+
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border: 2px solid #333;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            padding: 1em;
+            box-sizing: border-box;
+        }
+
+        .flashcard-front p, .flashcard-back p {
+            margin: 0;
+        }
+
+        .flashcard-front .side-label, .flashcard-back .side-label {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 0.8em;
+            color: #777;
+        }
+
+        .flashcard-back {
+            transform: rotateY(180deg);
+        }
+
+        .thumbs {
+            display: flex;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        .thumbs button {
+            background-color: #f9f9f9;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 0 5px;
+            padding: 0.5em 1em;
+            font-size: 1.2em;
+            transition: background-color 0.3s, color 0.3s;
+        }
+
+        .thumbs .thumb-up.green {
+            background-color: #e0ffe0;
+            color: green;
+        }
+
+        .thumbs .thumb-down.red {
+            background-color: #ffe0e0;
+            color: red;
+        }
+
+        .stack-link {
+            display: block;
+            padding: 1em;
+            margin-bottom: 1em;
+            background-color: #fff;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .stack-link:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.02);
+        }
+
+        .edit-button, .delete-button, .add-button, .rotate-button {
+            margin-left: 1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-button {
+            background-color: #f44336;
+        }
+
+        .rotate-button {
+            background-color: #008CBA;
+        }
+
+        .rotate-button:hover {
+            background-color: #007bb5;
+        }
+
+        .edit-button:hover, .add-button:hover {
+            background-color: #45a049;
+        }
+
+        .delete-button:hover {
+            background-color: #e53935;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+            <a href="flashcards.html">Flashcards</a>
+            <div id="user-section" class="user-section">
+                <!-- Login/Logout and username will be dynamically populated here -->
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="flashcard-stack-page">
+            <div style="display: flex; align-items: center;">
+                <h2 id="stack-name" style="flex-grow: 1;">Stack Name</h2>
+                <button id="rotate-all-button" class="rotate-button">Rotate All Cards</button>
+            </div>
+            <div id="flashcard-stack">
+                <!-- Flashcards will be dynamically populated here -->
+            </div>
+            <button id="add-flashcard-button" style="display: none;">Add Flashcard</button>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const stackName = new URLSearchParams(window.location.search).get('name');
+            const flashcardStacks = JSON.parse(localStorage.getItem('flashcardStacks')) || [];
+            const stack = flashcardStacks.find(s => s.stackName === stackName);
+            const flashcardStackContainer = document.getElementById('flashcard-stack');
+            const stackNameElement = document.getElementById('stack-name');
+            const rotateAllButton = document.getElementById('rotate-all-button');
+            const addFlashcardButton = document.getElementById('add-flashcard-button');
+            let allFlipped = false;
+
+            if (stack) {
+                stackNameElement.textContent = stack.stackName;
+                if (currentUser.isAdmin || currentUser.username === stack.username) {
+                    addFlashcardButton.style.display = 'inline-block';
+                }
+                stack.cards.forEach((card, cardIndex) => {
+                    const cardElement = document.createElement('div');
+                    cardElement.classList.add('flashcard');
+                    cardElement.dataset.index = cardIndex;
+                    cardElement.dataset.colorScheme = card.colorScheme;
+                    cardElement.innerHTML = `
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front" style="border-color: ${card.colorScheme};">
+                                <p>${card.front}</p>
+                                <p class="side-label">Side 1</p>
+                            </div>
+                            <div class="flashcard-back" style="border-color: ${card.colorScheme};">
+                                <p>${card.back}</p>
+                                <p class="side-label">Side 2</p>
+                            </div>
+                        </div>
+                        <div class="thumbs">
+                            <button class="thumb-up" data-index="${cardIndex}">&#128077;</button>
+                            <button class="thumb-down" data-index="${cardIndex}">&#128078;</button>
+                        </div>
+                        ${(currentUser.isAdmin || currentUser.username === stack.username) ? `
+                            <button class="edit-flashcard-button" data-index="${cardIndex}">Edit</button>
+                            <button class="delete-flashcard-button" data-index="${cardIndex}">Delete</button>
+                        ` : ''}
+                    `;
+                    flashcardStackContainer.appendChild(cardElement);
+
+                    // Add event listeners for card flip
+                    cardElement.querySelector('.flashcard-inner').addEventListener('click', () => {
+                        cardElement.classList.toggle('flip');
+                    });
+
+                    // Add event listeners for thumbs
+                    cardElement.querySelector('.thumb-up').addEventListener('click', (event) => {
+                        event.stopPropagation(); // Prevent the card from flipping when clicking the thumbs
+                        handleThumbsUp(cardIndex);
+                    });
+
+                    cardElement.querySelector('.thumb-down').addEventListener('click', (event) => {
+                        event.stopPropagation(); // Prevent the card from flipping when clicking the thumbs
+                        handleThumbsDown(cardIndex);
+                    });
+
+                    // Add event listeners for edit and delete buttons
+                    if (currentUser.isAdmin || currentUser.username === stack.username) {
+                        cardElement.querySelector('.edit-flashcard-button').addEventListener('click', () => handleEditFlashcard(cardIndex));
+                        cardElement.querySelector('.delete-flashcard-button').addEventListener('click', () => handleDeleteFlashcard(cardIndex));
+                    }
+                });
+            }
+
+            rotateAllButton.addEventListener('click', () => {
+                const flashcards = document.querySelectorAll('.flashcard');
+                allFlipped = !allFlipped;
+                flashcards.forEach(card => {
+                    if (allFlipped) {
+                        card.classList.add('flip');
+                    } else {
+                        card.classList.remove('flip');
+                    }
+                });
+            });
+
+            addFlashcardButton.addEventListener('click', () => {
+                const front = prompt('Enter front text:');
+                const back = prompt('Enter back text:');
+                if (front && back) {
+                    stack.cards.push({ front, back, colorScheme: stack.cards[0].colorScheme });
+                    localStorage.setItem('flashcardStacks', JSON.stringify(flashcardStacks));
+                    location.reload();
+                }
+            });
+
+            function handleThumbsUp(index) {
+                const thumbUpButton = document.querySelector(`.thumb-up[data-index="${index}"]`);
+                thumbUpButton.classList.add('green');
+                const thumbDownButton = document.querySelector(`.thumb-down[data-index="${index}"]`);
+                thumbDownButton.classList.remove('red');
+            }
+
+            function handleThumbsDown(index) {
+                const thumbDownButton = document.querySelector(`.thumb-down[data-index="${index}"]`);
+                thumbDownButton.classList.add('red');
+                const thumbUpButton = document.querySelector(`.thumb-up[data-index="${index}"]`);
+                thumbUpButton.classList.remove('green');
+            }
+
+            function handleEditFlashcard(index) {
+                const card = stack.cards[index];
+                const newFront = prompt('Edit front text:', card.front);
+                const newBack = prompt('Edit back text:', card.back);
+                if (newFront && newBack) {
+                    card.front = newFront;
+                    card.back = newBack;
+                    localStorage.setItem('flashcardStacks', JSON.stringify(flashcardStacks));
+                    location.reload();
+                }
+            }
+
+            function handleDeleteFlashcard(index) {
+                stack.cards.splice(index, 1);
+                localStorage.setItem('flashcardStacks', JSON.stringify(flashcardStacks));
+                location.reload();
+            }
+        });
+    </script>
+</body>
+</html>

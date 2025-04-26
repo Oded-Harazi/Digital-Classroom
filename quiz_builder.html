@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Builder - Math Tutoring</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Add custom styles for the quiz builder page */
+        .quiz-builder {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-builder h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .quiz-builder .quiz-details input,
+        .quiz-builder .quiz-details textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .quiz-builder .question {
+            margin-bottom: 15px;
+        }
+
+        .quiz-builder .question label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        .quiz-builder .question input[type="text"],
+        .quiz-builder .question textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .quiz-builder .add-question-btn,
+        .quiz-builder .post-quiz-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .quiz-builder .add-question-btn:hover,
+        .quiz-builder .post-quiz-btn:hover {
+            background-color: #45a049;
+        }
+
+        .quiz-builder .question-type {
+            margin-bottom: 10px;
+        }
+
+        .quiz-builder .option {
+            display: flex;
+            align-items: center;
+        }
+
+        .quiz-builder .option input[type="text"] {
+            flex-grow: 1;
+        }
+
+        .quiz-builder .option button {
+            margin-left: 10px;
+            padding: 5px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .quiz-builder .option button:hover {
+            background-color: darkred;
+        }
+
+        .quiz-builder .question-container {
+            margin-bottom: 20px;
+        }
+
+        .quiz-builder .style-options,
+        .quiz-builder .color-options {
+            margin-bottom: 10px;
+        }
+
+        .quiz-builder .style-options select,
+        .quiz-builder .color-options input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+        </nav>
+    </header>
+    <main>
+        <section class="quiz-builder">
+            <h2>Build Your Quiz</h2>
+            <div class="quiz-details">
+                <label for="quiz-title">Quiz Title</label>
+                <input type="text" id="quiz-title" placeholder="Enter quiz title">
+                <label for="quiz-description">Quiz Description</label>
+                <textarea id="quiz-description" placeholder="Enter quiz description"></textarea>
+            </div>
+            <div class="style-options">
+                <label for="quiz-style">Select Quiz Style</label>
+                <select id="quiz-style">
+                    <option value="style1">Style 1</option>
+                    <option value="style2">Style 2</option>
+                    <option value="style3">Style 3</option>
+                </select>
+            </div>
+            <div class="color-options">
+                <label for="quiz-color">Select Color Scheme</label>
+                <input type="color" id="quiz-color" value="#4CAF50">
+            </div>
+            <div id="question-container" class="question-container">
+                <!-- Questions will be dynamically added here -->
+            </div>
+            <button class="add-question-btn" id="add-question-btn">Add Question</button>
+            <button class="post-quiz-btn" id="post-quiz-btn">Post Quiz</button>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>

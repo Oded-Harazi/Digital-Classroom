@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Users - Math Tutoring</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Custom Styles for Manage Users Page */
+        .manage-users-page {
+            padding: 2em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .manage-users-page h2 {
+            text-align: center;
+            margin-bottom: 1em;
+            color: #333;
+            font-size: 2em;
+            animation: slideInLeft 1s ease-in-out;
+        }
+
+        .manage-users-page .user {
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 1em;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            animation: fadeInUp 1s ease-in-out;
+        }
+
+        .manage-users-page .user:hover {
+            background-color: #e6e6e6;
+            transform: scale(1.02);
+        }
+
+        .manage-users-page .delete-button {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .manage-users-page .delete-button:hover {
+            background-color: #c0392b;
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+            <a href="admin.html">Admin Dashboard</a>
+            <div id="user-section" class="user-section">
+                <!-- Login/Logout and username will be dynamically populated here -->
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="manage-users-page">
+            <h2>Manage Users</h2>
+            <div id="users-list">
+                <!-- Users list will be dynamically populated here -->
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forum - Math Tutoring</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Custom Styles for Forum Page */
+        .forum {
+            padding: 2em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .forum .question {
+            border: 1px solid #ccc;
+            padding: 1em;
+            margin-bottom: 1em;
+            border-radius: 8px;
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, background-color 0.3s ease;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .forum .question:hover {
+            background-color: #e6e6e6;
+            transform: scale(1.02);
+        }
+
+        .forum .question h3 {
+            color: #333;
+            animation: slideInLeft 1s ease-in-out;
+        }
+
+        .forum .question p {
+            color: #666;
+        }
+
+        .forum .reply-button, .resolve-button {
+            margin-top: 1em;
+            cursor: pointer;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .forum .reply-button:hover, .resolve-button:hover {
+            background-color: #45a049;
+        }
+
+        .forum .reply {
+            margin-top: 1em;
+            border-top: 1px solid #ccc;
+            padding-top: 1em;
+        }
+
+        .forum form {
+            margin-bottom: 2em;
+            padding: 2em;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1.5s ease-in-out;
+        }
+
+        .forum form label {
+            display: block;
+            margin-bottom: 0.5em;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .forum form input[type="text"],
+        .forum form textarea,
+        .forum form input[type="file"] {
+            width: 100%;
+            padding: 0.5em;
+            margin-bottom: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        .forum form input[type="text"]:focus,
+        .forum form textarea:focus,
+        .forum form input[type="file"]:focus {
+            border-color: #4CAF50;
+        }
+
+        .forum form button {
+            width: 100%;
+            padding: 0.75em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .forum form button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+            <a href="resolved_forum.html">Resolved Forums</a>
+            <a href="post_question.html">Post a Question</a> <!-- New link to post a question -->
+            <div id="user-section" class="user-section">
+                <!-- Login/Logout and username will be dynamically populated here -->
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="forum">
+            <h2>Math Tutoring Forum</h2>
+            <div id="questions-list">
+                <!-- Dynamically populated with questions -->
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+</body>
+</html>

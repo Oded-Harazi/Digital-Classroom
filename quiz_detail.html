@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Detail - Math Tutoring</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Custom Styles */
+        .quiz-detail-page {
+            padding: 2em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        h2, p, label {
+            color: #333;
+        }
+
+        h2 {
+            animation: slideInRight 1s ease-in-out;
+        }
+
+        p {
+            animation: fadeIn 1.5s ease-in-out;
+        }
+
+        form {
+            margin-top: 2em;
+            animation: slideInUp 1.5s ease-in-out;
+        }
+
+        input[type="file"], textarea {
+            margin-bottom: 1em;
+        }
+
+        button {
+            background-color: #ff9800;
+            color: white;
+            border: none;
+            padding: 0.75em 1.5em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #e68900;
+            transform: scale(1.05);
+        }
+
+        .submitted-answer {
+            margin-top: 2em;
+            background-color: #e7f3e7;
+            border: 1px solid #c4e3c4;
+            padding: 1em;
+            border-radius: 5px;
+            animation: fadeInUp 2s ease-in-out;
+        }
+
+        .admin-textbox {
+            position: fixed;
+            top: 50px;
+            right: 10px;
+            padding: 1em;
+            background-color: #f0f0f0;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            display: none; /* Hidden by default */
+        }
+
+        .admin-textbox textarea {
+            width: 100%;
+            height: 100px;
+        }
+
+        .admin-textbox button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .admin-textbox button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        /* Add custom styles for the quiz detail page */
+        .quiz-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-container h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .quiz-container .question {
+            margin-bottom: 15px;
+            animation: fadeInUp 0.5s ease-in-out;
+        }
+
+        .quiz-container .question label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #444;
+            font-size: 1.2em;
+        }
+
+        .quiz-container .question input[type="text"],
+        .quiz-container .question textarea,
+        .quiz-container .question select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s ease;
+        }
+
+        .quiz-container .question input[type="text"]:focus,
+        .quiz-container .question textarea:focus,
+        .quiz-container .question select:focus {
+            border-color: #ff9800;
+        }
+
+        .quiz-container .submit-quiz-btn {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .quiz-container .submit-quiz-btn:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        .quiz-container .answer {
+            background-color: #f0f0f0;
+            padding: 1em;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        .quiz-container .answer:hover {
+            background-color: #e0e0e0;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(50px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideInUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes fadeInUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+            <div id="user-section" class="user-section">
+                <!-- Login/Logout and username will be dynamically populated here -->
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="quiz-detail-page">
+            <h2 id="quiz-title">Quiz Title</h2>
+            <p id="quiz-description">Quiz Description</p>
+            <div id="quiz-questions" class="quiz-container">
+                <!-- Quiz questions will be dynamically populated here -->
+            </div>
+            <form id="quiz-answer-form">
+                <button type="submit" class="submit-quiz-btn">Submit Quiz</button>
+            </form>
+            <div id="submitted-answer" class="submitted-answer">
+                <!-- Submitted answer will be displayed here -->
+            </div>
+        </section>
+        <div class="admin-textbox" id="admin-textbox">
+            <label for="admin-note">Admin Note:</label>
+            <textarea id="admin-note"></textarea>
+            <button id="save-admin-note">Save</button>
+        </div>
+    </main>
+    <footer>
+        <p>&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const quizTitle = getParameterByName('title');
+            const quizzes = JSON.parse(localStorage.getItem('quizzes')) || [];
+            const quiz = quizzes.find(q => q.title === quizTitle);
+            const attemptCounterKey = `${quizTitle}_attempts`;
+
+            if (quiz) {
+                document.getElementById('quiz-title').textContent = quiz.title;
+                document.getElementById('quiz-description').textContent = quiz.description;
+                const quizQuestionsContainer = document.getElementById('quiz-questions');
+
+                // Apply quiz color from localStorage
+                if (quiz.color) {
+                    quizQuestionsContainer.style.borderColor = quiz.color;
+                    quizQuestionsContainer.style.borderWidth = '3px';
+                    quizQuestionsContainer.style.borderStyle = 'solid';
+                }
+
+                // Populate quiz questions
+                quiz.questions.forEach((question, index) => {
+                    const questionDiv = document.createElement('div');
+                    questionDiv.classList.add('question');
+
+                    if (question.type === 'multiple-choice') {
+                        questionDiv.innerHTML = `
+                            <label>${question.text}</label>
+                            ${question.answers.map((option, i) => `
+                                <div class="answer">
+                                    <input type="radio" name="question-${index}" value="${option.text}" id="question-${index}-option-${i}">
+                                    <label for="question-${index}-option-${i}">${option.text}</label>
+                                </div>
+                            `).join('')}
+                        `;
+                    } else {
+                        questionDiv.innerHTML = `
+                            <label>${question.text}</label>
+                            <textarea name="question-${index}" id="question-${index}" required></textarea>
+                        `;
+                    }
+
+                    quizQuestionsContainer.appendChild(questionDiv);
+                });
+
+                // Load previously submitted answers
+                loadSubmittedAnswers(quizTitle, quiz.questions);
+            }
+
+            const quizAnswerForm = document.getElementById('quiz-answer-form');
+            if (quizAnswerForm) {
+                quizAnswerForm.addEventListener('submit', (event) => {
+                    event.preventDefault();
+                    const answers = {};
+
+                    quiz.questions.forEach((question, index) => {
+                        if (question.type === 'multiple-choice') {
+                            const selectedOption = document.querySelector(`input[name="question-${index}"]:checked`);
+                            answers[`question-${index}`] = selectedOption ? selectedOption.value : null;
+                        } else {
+                            const answer = document.getElementById(`question-${index}`).value;
+                            answers[`question-${index}`] = answer;
+                        }
+                    });
+
+                    const submissions = JSON.parse(localStorage.getItem('submissions')) || {};
+                    submissions[quizTitle] = answers;
+                    localStorage.setItem('submissions', JSON.stringify(submissions));
+
+                    // Increment attempt counter
+                    let attempts = JSON.parse(localStorage.getItem(attemptCounterKey)) || 0;
+                    attempts++;
+                    localStorage.setItem(attemptCounterKey, JSON.stringify(attempts));
+
+                    alert('Quiz submitted successfully!');
+                    displaySubmittedAnswer(quizTitle, quiz.questions, attempts);
+                });
+            }
+
+            // Function to load previously submitted answers
+            function loadSubmittedAnswers(quizTitle, questions) {
+                const submissions = JSON.parse(localStorage.getItem('submissions')) || {};
+                const savedAnswers = submissions[quizTitle] || {};
+                const attempts = JSON.parse(localStorage.getItem(attemptCounterKey)) || 0;
+
+                for (const [key, value] of Object.entries(savedAnswers)) {
+                    const questionIndex = key.split('-')[1];
+                    const question = questions[questionIndex];
+
+                    if (question.type === 'multiple-choice') {
+                        const option = document.querySelector(`input[name="question-${questionIndex}"][value="${value}"]`);
+                        if (option) {
+                            option.checked = true;
+                        }
+                    } else {
+                        const textarea = document.getElementById(`question-${questionIndex}`);
+                        if (textarea) {
+                            textarea.value = value;
+                        }
+                    }
+                }
+
+                // Display previously submitted answers and attempts
+                displaySubmittedAnswer(quizTitle, questions, attempts);
+            }
+
+            // Function to display submitted answers
+            function displaySubmittedAnswer(quizTitle, questions, attempts) {
+                const submissions = JSON.parse(localStorage.getItem('submissions')) || {};
+                const answers = submissions[quizTitle] || {};
+                const submittedAnswerContainer = document.getElementById('submitted-answer');
+                submittedAnswerContainer.innerHTML = `<h3>Answers Submitted (${attempts} attempts):</h3>`;
+                for (const [key, value] of Object.entries(answers)) {
+                    const questionIndex = key.split('-')[1];
+                    const question = questions[questionIndex];
+                    submittedAnswerContainer.innerHTML += `
+                        <p><strong>${question.text}</strong></p>
+                        <p>${value}</p>
+                    `;
+                }
+            }
+
+            // Show admin textbox if the user is an admin
+            if (currentUser && currentUser.isAdmin) {
+                const adminTextbox = document.getElementById('admin-textbox');
+                adminTextbox.style.display = 'block';
+
+                // Load saved admin note
+                const adminNotes = JSON.parse(localStorage.getItem('adminNotes')) || {};
+                if (adminNotes[quizTitle]) {
+                    document.getElementById('admin-note').value = adminNotes[quizTitle];
+                }
+
+                // Save admin note on button click
+                document.getElementById('save-admin-note').addEventListener('click', () => {
+                    const adminNote = document.getElementById('admin-note').value;
+                    const adminNotes = JSON.parse(localStorage.getItem('adminNotes')) || {};
+                    adminNotes[quizTitle] = adminNote;
+                    localStorage.setItem('adminNotes', JSON.stringify(adminNotes));
+                    alert('Admin note saved successfully!');
+                });
+            }
+
+            function getParameterByName(name) {
+                const urlParams = new URLSearchParams(window.location.search);
+                return urlParams.get(name);
+            }
+        });
+    </script>
+</body>
+</html>

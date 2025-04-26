@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Tutoring Website</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="customize_styles.css">
+    <script src="scripts.js" defer></script>
+    <style>
+        .edit-mode-button {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            display: none; /* Initially hidden, only shows for admin */
+        }
+        .right-click-dropdown, .edit-dropdown {
+            position: absolute;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            z-index: 1000;
+        }
+        .draggable {
+            position: absolute;
+        }
+        #preset-container {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            background-color: white;
+            border: 1px solid #ccc;
+            padding: 10px;
+            z-index: 1000;
+            display: none; /* Only visible in edit mode */
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Edit mode toggle button, only visible for admins -->
+    <button id="toggleButton" class="edit-mode-button" onclick="toggleMode()">Classroom Mode</button>
+
+    <header id="header" contenteditable="false">
+        <nav>
+            <a href="index.html" id="home-link">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+
+            <div id="user-section" class="user-section">
+                <!-- Login/Logout and username will be dynamically populated here -->
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <h1 id="hero-title" contenteditable="false">Welcome to Math Tutoring</h1>
+            <p id="hero-description" contenteditable="false">Your path to mastering mathematics.</p>
+
+            <section class="math-graphic-container" contenteditable="false">
+                <img src="path-to-math-graphic.png" alt="Math Graphic" class="math-graphic">
+            </section>
+        </section>
+        <section class="content">
+            <h2 id="about-title" contenteditable="false">About Us</h2>
+            <p id="about-description" contenteditable="false">We offer comprehensive math tutoring services...</p>
+            <div class="video-container" contenteditable="false">
+                <iframe src="https://www.youtube.com/embed/your-video-id" frameborder="0" allowfullscreen></iframe>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p id="footer-text" contenteditable="false">&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+
+    <!-- Preset container for saving and resetting page states -->
+    <div id="preset-container">
+        <h4>Presets</h4>
+        <input type="text" id="preset-name" placeholder="Enter preset name">
+        <button onclick="savePreset()">Save Preset</button>
+        <button onclick="resetPage()">Reset Page</button>
+        <div id="presets-list"></div>
+    </div>
+
+    <!-- Include normal dropdown menu for selected elements -->
+    <div id="normal-dropdown" class="edit-dropdown" style="display:none;">
+        <div class="dropdown-header">
+            <button class="close-dropdown" unselectable="on">X</button>
+            <div class="drag-dropdown" unselectable="on">⬤</div>
+        </div>
+        <div class="dropdown-content">
+            <div class="dropdown-tabs">
+                <button class="tablink" onclick="openTab(event, 'Text')">Text</button>
+                <button class="tablink" onclick="openTab(event, 'Background')">Background</button>
+                <button class="tablink" onclick="openTab(event, 'Border')">Border</button>
+                <button class="tablink" onclick="openTab(event, 'Other')">Other</button>
+            </div>
+            <div id="Text" class="tabcontent">
+                <!-- Add text-editing options here -->
+            </div>
+            <div id="Background" class="tabcontent">
+                <!-- Add background-editing options here -->
+            </div>
+            <div id="Border" class="tabcontent">
+                <!-- Add border-editing options here -->
+            </div>
+            <div id="Other" class="tabcontent">
+                <!-- Add other-editing options here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Include right-click dropdown menu -->
+    <div id="right-click-dropdown" class="right-click-dropdown" style="display:none;">
+        <div class="dropdown-header">
+            <button class="close-dropdown" unselectable="on">X</button>
+            <div class="drag-dropdown" unselectable="on">⬤</div>
+        </div>
+        <div class="dropdown-content">
+            <label>Area Color: <input type="color" id="right-background-color"></label>
+            <label>Add Textbox: <button id="add-textbox">Add</button></label>
+            <label>Change Website Background Color: <input type="color" id="website-background-color"></label>
+        </div>
+    </div>
+
+    <script>
+        let editMode = false;
+        let presets = JSON.parse(localStorage.getItem('presets')) || {}; // Load presets from localStorage
+
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAdmin(); // Ensure only admins see the toggle button
+            initializePage(); // Ensures page loads in classroom mode
+            setupRightClickListener(); // Set up right-click event listener for dropdown
+            setupSelectionListener(); // Set up normal selection for dropdown
+        });
+
+        // Check if current user is admin, show toggle button if true
+        function checkAdmin() {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+            const toggleButton = document.getElementById('toggleButton');
+            if (currentUser && currentUser.isAdmin) {
+                toggleButton.style.display = 'block'; // Show toggle for admins
+            }
+        }
+
+        // Initialize page in classroom mode and ensure presets are loaded
+        function initializePage() {
+            loadPage(); // Load saved page state (if any)
+            setClassroomMode(); // Start in classroom mode
+            loadPresets(); // Load any available presets
+        }
+
+        // Toggle between classroom and edit modes
+        function toggleMode() {
+            const button = document.getElementById('toggleButton');
+            const presetContainer = document.getElementById('preset-container');
+            if (button.textContent === 'Classroom Mode') {
+                button.textContent = 'Edit Mode';
+                presetContainer.style.display = 'block'; // Show preset container in edit mode
+                enableEditMode();
+            } else {
+                button.textContent = 'Classroom Mode';
+                presetContainer.style.display = 'none'; // Hide preset container
+                setClassroomMode(); // Switch back to classroom mode
+                savePage(); // Save the page on exit from edit mode
+            }
+        }
+
+        // Enable temporary edit mode (reverts to classroom on refresh or toggle)
+        function enableEditMode() {
+            document.querySelectorAll('[contenteditable]').forEach(element => {
+                element.contentEditable = true;
+            });
+        }
+
+        // Set the page back to classroom mode
+        function setClassroomMode() {
+            document.querySelectorAll('[contenteditable]').forEach(element => {
+                element.contentEditable = false;
+            });
+        }
+
+        // Save the current state of the page to localStorage
+        function savePage() {
+            const pageContent = document.body.innerHTML;
+            localStorage.setItem(window.location.pathname, pageContent); // Save the page content
+            alert('Page saved successfully!'); // Optional success message
+        }
+
+        // Load the saved state of the page from localStorage
+        function loadPage() {
+            const savedContent = localStorage.getItem(window.location.pathname);
+            if (savedContent) {
+                document.body.innerHTML = savedContent; // Load saved content
+            }
+        }
+
+        // Reset page to original state (preserved from before edits)
+        function resetPage() {
+            if (confirm('Are you sure you want to reset the page to its original state? This action cannot be undone.')) {
+                localStorage.removeItem(window.location.pathname); // Clear saved state
+                location.reload(); // Reload the page to its original state
+            }
+        }
+
+        // Save a preset of the current state of the page
+        function savePreset() {
+            const presetName = document.getElementById('preset-name').value;
+            if (presetName) {
+                localStorage.setItem(presetName, document.body.innerHTML);
+                alert('Preset saved successfully!');
+            } else {
+                alert('Please enter a name for the preset.');
+            }
+        }
+
+        // Load and display saved presets (if any)
+        function loadPresets() {
+            const presetsList = document.getElementById('presets-list');
+            const presetKeys = Object.keys(localStorage).filter(key => key !== window.location.pathname && key !== 'currentUser');
+            presetsList.innerHTML = '';
+            presetKeys.forEach(preset => {
+                const button = document.createElement('button');
+                button.textContent = preset;
+                button.onclick = () => loadPreset(preset);
+                presetsList.appendChild(button);
+            });
+        }
+
+        // Load a preset from localStorage
+        function loadPreset(preset) {
+            if (confirm(`Are you sure you want to load the preset "${preset}"?`)) {
+                document.body.innerHTML = localStorage.getItem(preset);
+                location.reload(); // Reload the page with the preset content
+            }
+        }
+
+        // Set up event listener for normal dropdown (click-based editing)
+        function setupSelectionListener() {
+            document.addEventListener('mouseup', function(event) {
+                const element = event.target.closest('[contenteditable="true"], .draggable');
+                if (element && editMode) {
+                    showEditOptions(event, element);
+                }
+            });
+        }
+
+        // Set up right-click event listener for context dropdown
+        function setupRightClickListener() {
+            document.addEventListener('contextmenu', function(event) {
+                event.preventDefault();
+                const element = event.target.closest('[contenteditable="true"], .draggable');
+                if (element && editMode) {
+                    showRightClickOptions(event, element);
+                }
+            });
+        }
+
+        // Show normal dropdown menu for selected elements
+        function showEditOptions(event, element) {
+            const dropdown = document.getElementById('normal-dropdown');
+            dropdown.style.display = 'block';
+            dropdown.style.top = `${event.clientY}px`;
+            dropdown.style.left = `${event.clientX}px`;
+            // Add functionality to edit the selected element here
+        }
+
+        // Show right-click dropdown menu for additional options
+        function showRightClickOptions(event, element) {
+            const dropdown = document.getElementById('right-click-dropdown');
+            dropdown.style.display = 'block';
+            dropdown.style.top = `${event.clientY}px`;
+            dropdown.style.left = `${event.clientX}px`;
+            // Add functionality to edit the selected element here
+        }
+    </script>
+</body>
+</html>

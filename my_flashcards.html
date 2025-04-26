@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Flashcards - Math Tutoring</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .flashcard-stacks-page {
+            padding: 2em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        .stack-link {
+            display: block;
+            padding: 1em;
+            margin-bottom: 1em;
+            background-color: #fff;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            text-decoration: none;
+            color: #333;
+            font-size: 1.2em;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .stack-link:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.02);
+        }
+
+        .edit-button, .delete-button {
+            margin-left: 1em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5em 1em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .delete-button {
+            background-color: #f44336;
+        }
+
+        .edit-button:hover {
+            background-color: #45a049;
+        }
+
+        .delete-button:hover {
+            background-color: #e53935;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+            <a href="flashcards.html">Flashcards</a>
+            <div id="user-section" class="user-section">
+                <!-- Login/Logout and username will be dynamically populated here -->
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="flashcard-stacks-page">
+            <h2>My Flashcard Stacks</h2>
+            <div id="flashcard-stacks">
+                <!-- Flashcard stacks will be dynamically populated here -->
+            </div>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+    <script src="scripts.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+
+            // Load user flashcard stacks
+            loadUserFlashcardStacks();
+
+            function loadUserFlashcardStacks() {
+                const flashcardStacks = JSON.parse(localStorage.getItem('flashcardStacks')) || [];
+                const userStacks = flashcardStacks.filter(stack => stack.username === currentUser.username);
+                const flashcardStacksContainer = document.getElementById('flashcard-stacks');
+
+                userStacks.forEach((stack) => {
+                    const stackElement = document.createElement('div');
+                    stackElement.classList.add('stack-link');
+                    stackElement.innerHTML = `
+                        <a href="flashcard_stack.html?name=${stack.stackName}">${stack.stackName}</a>
+                        <button class="edit-button" data-name="${stack.stackName}">Edit</button>
+                        <button class="delete-button" data-name="${stack.stackName}">Delete</button>
+                    `;
+                    flashcardStacksContainer.appendChild(stackElement);
+
+                    // Add event listeners for edit and delete buttons
+                    stackElement.querySelector('.edit-button').addEventListener('click', handleEditStack);
+                    stackElement.querySelector('.delete-button').addEventListener('click', handleDeleteStack);
+                });
+            }
+
+            function handleEditStack(event) {
+                const stackName = event.target.dataset.name;
+                const flashcardStacks = JSON.parse(localStorage.getItem('flashcardStacks')) || [];
+                const stack = flashcardStacks.find(s => s.stackName === stackName);
+                if (stack) {
+                    const newStackName = prompt('Edit Stack Name:', stack.stackName);
+                    if (newStackName) {
+                        stack.stackName = newStackName;
+                        localStorage.setItem('flashcardStacks', JSON.stringify(flashcardStacks));
+                        alert('Stack updated successfully!');
+                        location.reload();
+                    }
+                }
+            }
+
+            function handleDeleteStack(event) {
+                const stackName = event.target.dataset.name;
+                let flashcardStacks = JSON.parse(localStorage.getItem('flashcardStacks')) || [];
+                flashcardStacks = flashcardStacks.filter(stack => stack.stackName !== stackName);
+                localStorage.setItem('flashcardStacks', JSON.stringify(flashcardStacks));
+                alert('Stack deleted successfully!');
+                location.reload();
+            }
+        });
+    </script>
+</body>
+</html>

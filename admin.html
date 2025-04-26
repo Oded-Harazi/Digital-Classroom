@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Math Tutoring</title>
+    <link rel="stylesheet" href="styles.css">     
+    <style>
+        /* Custom Styles for Admin Page */
+        .admin-dashboard {
+            padding: 2em;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+        }
+
+        .admin-dashboard h2, .admin-dashboard h3 {
+            text-align: center;
+            margin-bottom: 1em;
+            color: #333;
+            font-size: 2em;
+            animation: slideInLeft 1s ease-in-out;
+        }
+
+        .admin-dashboard form {
+            margin-bottom: 2em;
+            padding: 2em;
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            animation: fadeInUp 1s ease-in-out;
+        }
+
+        .admin-dashboard label {
+            display: block;
+            margin-bottom: 0.5em;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .admin-dashboard input[type="text"],
+        .admin-dashboard textarea,
+        .admin-dashboard input[type="file"] {
+            width: 100%;
+            padding: 0.5em;
+            margin-bottom: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        .admin-dashboard input[type="text"]:focus,
+        .admin-dashboard textarea:focus,
+        .admin-dashboard input[type="file"]:focus {
+            border-color: #4CAF50;
+        }
+
+        .admin-dashboard button {
+            width: 100%;
+            padding: 0.75em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .admin-dashboard button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+
+        @keyframes fadeInUp {
+            from {
+                transform: translateY(20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideInLeft {
+            from {
+                transform: translateX(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        .question-container {
+            margin-bottom: 1em;
+            padding: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .question-container h4 {
+            margin-bottom: 0.5em;
+            color: #333;
+        }
+
+        .question-container label {
+            display: block;
+            margin-bottom: 0.5em;
+            color: #666;
+            font-weight: bold;
+        }
+
+        .question-container input[type="text"],
+        .question-container textarea {
+            width: 100%;
+            padding: 0.5em;
+            margin-bottom: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        .question-container input[type="text"]:focus,
+        .question-container textarea:focus {
+            border-color: #4CAF50;
+        }
+
+        .question-container .answer {
+            display: flex;
+            align-items: center;
+        }
+
+        .question-container .answer input[type="text"] {
+            flex: 1;
+            margin-right: 0.5em;
+        }
+
+        .question-container .answer input[type="checkbox"] {
+            margin-right: 0.5em;
+        }
+
+        .question-container .add-answer-button {
+            margin-top: 0.5em;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 0.5em;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+        }
+
+        .question-container .add-answer-button:hover {
+            background-color: #45a049;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="lessons.html">Lessons</a>
+            <a href="forum.html">Forum</a>
+            <a href="progress.html">Progress</a>
+            <a href="resources.html">More Resources</a>
+            <a href="manage_users.html">Manage Users</a>
+            <div id="user-section" class="user-section">
+                <!-- Login/Logout and username will be dynamically populated here -->
+            </div>
+        </nav>
+    </header>
+    <main>
+        <section class="admin-dashboard">
+            <h2>Admin Dashboard</h2>
+            <form id="post-quiz-form">
+                <h3>Post a Quiz</h3>
+                <label for="quiz-title">Quiz Title:</label>
+                <input type="text" id="quiz-title" name="quiz-title" required>
+                <label for="quiz-description">Quiz Description:</label>
+                <textarea id="quiz-description" name="quiz-description" required></textarea>
+                <label for="quiz-file">Attach a File:</label>
+                <input type="file" id="quiz-file" name="quiz-file" accept=".png, .jpg, .jpeg, .pdf">
+                <label for="quiz-video">Video URL:</label>
+                <input type="text" id="quiz-video" name="quiz-video">
+                <label for="quiz-color">Quiz Color:</label>
+                <input type="color" id="quiz-color" name="quiz-color">
+                
+                <div id="questions-container">
+                    <!-- Questions will be added dynamically here -->
+                </div>
+                <button type="button" id="add-question-button">Add Question</button>
+
+                <label for="order">Order:</label>
+                <select id="order">
+                    <option value="end">End</option>
+                    <!-- Dynamic options will be populated here by scripts.js -->
+                </select>
+                <button type="submit">Post Quiz</button>
+            </form>
+            <form id="post-lesson-form">
+                <h3>Post a Lesson</h3>
+                <label for="lesson-title">Lesson Title:</label>
+                <input type="text" id="lesson-title" name="lesson-title" required>
+                <label for="lesson-description">Lesson Description:</label>
+                <textarea id="lesson-description" name="lesson-description" required></textarea>
+                <label for="lesson-file">Attach a File:</label>
+                <input type="file" id="lesson-file" name="lesson-file" accept=".png, .jpg, .jpeg, .pdf">
+                <label for="lesson-video">Video URL:</label>
+                <input type="text" id="lesson-video" name="lesson-video">
+                
+                <label for="order">Order:</label>
+                <select id="order">
+                    <option value="end">End</option>
+                    <!-- Dynamic options will be populated here by scripts.js -->
+                </select>
+                <button type="submit">Post Lesson</button>
+            </form>
+        </section>
+    </main>
+    <footer>
+        <p>&copy; 2024 Math Tutoring. All rights reserved.</p>
+    </footer>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Function to add a new question
+            const addQuestionButton = document.getElementById('add-question-button');
+            addQuestionButton.addEventListener('click', () => {
+                const questionContainer = document.createElement('div');
+                questionContainer.classList.add('question-container');
+                questionContainer.innerHTML = `
+                    <h4>Question</h4>
+                    <label for="question-text">Question Text:</label>
+                    <input type="text" class="question-text" required>
+                    <label for="question-type">Question Type:</label>
+                    <select class="question-type" required>
+                        <option value="text">Text Answer</option>
+                        <option value="multiple-choice">Multiple Choice</option>
+                    </select>
+                    <div class="answers-container">
+                        <!-- Answers will be added dynamically here for multiple choice questions -->
+                    </div>
+                    <button type="button" class="add-answer-button">Add Answer</button>
+                `;
+
+                document.getElementById('questions-container').appendChild(questionContainer);
+
+                // Add event listener for the question type change
+                const questionTypeSelect = questionContainer.querySelector('.question-type');
+                questionTypeSelect.addEventListener('change', (event) => {
+                    const answersContainer = questionContainer.querySelector('.answers-container');
+                    if (event.target.value === 'multiple-choice') {
+                        answersContainer.innerHTML = `
+                            <div class="answer">
+                                <input type="text" class="answer-text" required>
+                                <label for="is-correct">Correct:</label>
+                                <input type="checkbox" class="is-correct">
+                            </div>
+                        `;
+                    } else {
+                        answersContainer.innerHTML = '';
+                    }
+                });
+
+                // Add event listener for the add answer button
+                const addAnswerButton = questionContainer.querySelector('.add-answer-button');
+                addAnswerButton.addEventListener('click', () => {
+                    const answersContainer = questionContainer.querySelector('.answers-container');
+                    const answerElement = document.createElement('div');
+                    answerElement.classList.add('answer');
+                    answerElement.innerHTML = `
+                        <input type="text" class="answer-text" required>
+                        <label for="is-correct">Correct:</label>
+                        <input type="checkbox" class="is-correct">
+                    `;
+                    answersContainer.appendChild(answerElement);
+                });
+            });
+        });
+    </script>
+    <script src="scripts.js"></script>
+</body>
+</html>
